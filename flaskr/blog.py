@@ -8,6 +8,7 @@ from flaskr.db import get_db
 
 bp = Blueprint('blog', __name__)
 
+
 @bp.route('/')
 def index():
     db = get_db()
@@ -17,6 +18,7 @@ def index():
         ' ORDER BY created DESC'
     ).fetchall()
     return render_template('blog/index.html', posts=posts)
+
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -100,4 +102,27 @@ def delete(id):
     db = get_db()
     db.execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
+    return redirect(url_for('blog.index'))
+
+
+@bp.route('/<int:id>/like', methods=('GET', 'POST'))
+@login_required
+def like(id):
+    post = get_post(id)
+    db = get_db()
+
+    if request.form == 'POST':
+        value = request.form['value']
+        if value == 'like':
+            db.execute(
+                'INSERT INTO likes SET likes = likes + ? WHERE post_id = ?',
+                (1, post)
+            )
+        else:
+            db.execute(
+                'INSERT INTO likes SET dislikes = dislikes + ? WHERE post_id = ?',
+                (1, post)
+            )
+        db.commit()
+        
     return redirect(url_for('blog.index'))
