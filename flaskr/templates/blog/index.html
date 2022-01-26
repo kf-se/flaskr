@@ -26,8 +26,8 @@
       <p class="body">{{ post['body'] }}</p>
       <table>
         <form action="{{ url_for('blog.like', id=post['id']) }}"  method="post">  
-          <td><input type="submit" name="like" value="like"></td>
-          <td><input type="submit" name="dislike" value="dislike"></td>
+          <td><input type="submit" name="like" value="{{ request.form=['like'] }}"></td>
+          <td><input type="submit" name="dislike" value="{{ request.form=['dislike'] }}"></td>
         </form>
       </table>
     </article>

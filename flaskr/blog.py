@@ -6,7 +6,34 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
+import sys
+
 bp = Blueprint('blog', __name__)
+
+
+@bp.route('/<int:id>/like', methods=('GET', 'POST'))
+@login_required
+def like(id):
+    post = get_post(id)
+    db = get_db()
+    if request.form == 'POST':
+        value = request.form['value']
+        
+        if value == 'like':
+            db.execute(
+                'INSERT INTO likes (post_id, likes) VALUES(?,?)'
+                'ON DUPLICATE KEY UPDATE '
+                'SET likes = likes + ? WHERE post_id = ?',
+                (id, 1, 1, id)
+            )
+        else:
+            db.execute(
+                'INSERT INTO likes SET dislikes = dislikes + ? WHERE post_id = ?',
+                (1, id)
+            )
+        db.commit()
+        
+    return redirect(url_for('blog.index'))
 
 
 @bp.route('/')
@@ -105,24 +132,4 @@ def delete(id):
     return redirect(url_for('blog.index'))
 
 
-@bp.route('/<int:id>/like', methods=('GET', 'POST'))
-@login_required
-def like(id):
-    post = get_post(id)
-    db = get_db()
 
-    if request.form == 'POST':
-        value = request.form['value']
-        if value == 'like':
-            db.execute(
-                'INSERT INTO likes SET likes = likes + ? WHERE post_id = ?',
-                (1, post)
-            )
-        else:
-            db.execute(
-                'INSERT INTO likes SET dislikes = dislikes + ? WHERE post_id = ?',
-                (1, post)
-            )
-        db.commit()
-        
-    return redirect(url_for('blog.index'))
