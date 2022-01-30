@@ -15,6 +15,7 @@ bp = Blueprint('blog', __name__)
 def like(id):
     post = get_post(id, False)
     db = get_db()
+
     if request.method == 'POST':
         print(request.form)
         value = request.form['value']
@@ -34,7 +35,7 @@ def like(id):
                 (id, 1, 1, id)
             )
         db.commit()
-        
+
     return redirect(url_for('blog.index'))
 
 
@@ -42,9 +43,10 @@ def like(id):
 def index():
     db = get_db()
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' ORDER BY created DESC'
+        'SELECT user.id, post.id, post.title, post.body, post.created, likes.likes, likes.dislikes FROM likes'
+        'INNER JOIN post ON likes.post_id = post.id'
+        'INNER JOIN user ON post.author_id = user.id'
+        'ORDER BY created DESC'
     ).fetchall()
     return render_template('blog/index.html', posts=posts)
 

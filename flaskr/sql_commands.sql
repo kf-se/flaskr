@@ -1,11 +1,14 @@
-SELECT user.id, post.id, post.title, likes.likes, likes.dislikes FROM likes
+SELECT user.id, post.id, post.title, post.body, post.created, likes.likes, likes.dislikes FROM likes
 INNER JOIN post ON likes.post_id = post.id
-INNER JOIN user ON post.author_id = user.id;
+INNER JOIN user ON post.author_id = user.id
+ORDER BY created DESC;
 
 INSERT INTO likes (post_id, likes) VALUES(1, 1)
 ON DUPLICATE KEY DO UPDATE 
 SET likes = likes + 1 WHERE post_id = 1;
 
-INSERT INTO likes (post_id, likes) VALUES(2, 1)
+INSERT INTO likes (post_id, dislikes) VALUES(2, 1)
 ON CONFLICT (post_id) DO UPDATE 
-SET likes = likes + 1 WHERE post_id = 2;
+SET dislikes = dislikes + 1 WHERE post_id = 2;
+
+DELETE FROM likes WHERE post_id = 2;
