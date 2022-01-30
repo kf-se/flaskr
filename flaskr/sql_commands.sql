@@ -1,3 +1,11 @@
 SELECT user.id, post.id, post.title, likes.likes, likes.dislikes FROM likes
 INNER JOIN post ON likes.post_id = post.id
 INNER JOIN user ON post.author_id = user.id;
+
+INSERT INTO likes (post_id, likes) VALUES(1, 1)
+ON DUPLICATE KEY DO UPDATE 
+SET likes = likes + 1 WHERE post_id = 1;
+
+INSERT INTO likes (post_id, likes) VALUES(2, 1)
+ON CONFLICT (post_id) DO UPDATE 
+SET likes = likes + 1 WHERE post_id = 2;
