@@ -12,23 +12,23 @@ bp = Blueprint('blog', __name__)
 
 
 @bp.route('/<int:id>/like', methods=('POST',))
-@login_required
 def like(id):
-    post = get_post(id)
+    post = get_post(id, False)
     db = get_db()
     if request.method == 'POST':
+        print(request.form)
         value = request.form['value']
         
         if value == 'like':
             db.execute(
-                'INSERT INTO likes (post_id, likes) VALUES(?,?)'
+                'INSERT INTO likes (post_id, likes, dislikes) VALUES(?,?, 0)'
                 'ON CONFLICT(post_id) DO UPDATE '
                 'SET likes = likes + ? WHERE post_id = ?',
                 (id, 1, 1, id)
             )
         else:
             db.execute(
-                'INSERT INTO likes (post_id, likes) VALUES(?,?)'
+                'INSERT INTO likes (post_id, likes, dislikes) VALUES(?,0,?)'
                 'ON CONFLICT(post_id) DO UPDATE '
                 'SET dislikes = dislikes + ? WHERE post_id = ?',
                 (id, 1, 1, id)
