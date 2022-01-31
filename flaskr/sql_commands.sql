@@ -1,5 +1,9 @@
-SELECT user.id, post.id, post.title, post.body, post.created, likes.likes, likes.dislikes FROM likes
-INNER JOIN post ON likes.post_id = post.id
+SELECT user.id, post.id AS post_id, post.title, post.body, post.created, likes.likes, likes.dislikes FROM user
+INNER JOIN post ON post.author_id = user.id
+LEFT JOIN likes ON likes.post_id = post.id
+ORDER BY created DESC;
+
+SELECT user.id, post.id, post.title, post.body, post.created FROM post
 INNER JOIN user ON post.author_id = user.id
 ORDER BY created DESC;
 

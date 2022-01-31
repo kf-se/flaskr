@@ -34,6 +34,7 @@ def like(id):
                 'SET dislikes = dislikes + ? WHERE post_id = ?',
                 (id, 1, 1, id)
             )
+            
         db.commit()
 
     return redirect(url_for('blog.index'))
@@ -43,11 +44,13 @@ def like(id):
 def index():
     db = get_db()
     posts = db.execute(
-        'SELECT user.id, post.id, post.title, post.body, post.created, likes.likes, likes.dislikes FROM likes'
-        'INNER JOIN post ON likes.post_id = post.id'
-        'INNER JOIN user ON post.author_id = user.id'
-        'ORDER BY created DESC'
+        'SELECT post.id, user.id, user.username, post.title, post.body, post.created, '
+        ' IFNULL(likes.likes, "") as likes, IFNULL(likes.dislikes, "") as dislikes FROM user'
+        ' INNER JOIN post ON post.author_id = user.id'
+        ' LEFT JOIN likes ON likes.post_id = post.id'
+        ' ORDER BY created DESC'
     ).fetchall()
+
     return render_template('blog/index.html', posts=posts)
 
 
