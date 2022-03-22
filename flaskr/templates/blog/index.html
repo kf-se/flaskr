@@ -15,8 +15,9 @@
           <h1>{{ post['title'] }}</h1>
           <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }}</div>
         </div>
+        <!--How to print jinja template variable: {{ g.user['id'] }} -->
         {% if g.user['id'] == post['author_id'] %}
-          <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
+          <a class="action" href="{{ url_for('blog.update', id=post['id']) }}" method="get">Edit</a>
         {% endif %}
       </header>
       <p class="body">{{ post['body'] }}</p>

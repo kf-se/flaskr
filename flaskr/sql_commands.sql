@@ -1,4 +1,4 @@
-SELECT user.id, post.id AS post_id, post.title, post.body, post.created, likes.likes, likes.dislikes FROM user
+SELECT user.id, post.id AS post_id, post.title, post.body, post.created, post.author_id IFNULL(likes.likes, 0), IFNULL(likes.dislikes,0) FROM user
 INNER JOIN post ON post.author_id = user.id
 LEFT JOIN likes ON likes.post_id = post.id
 ORDER BY created DESC;

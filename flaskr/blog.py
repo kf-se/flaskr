@@ -44,7 +44,7 @@ def like(id):
 def index():
     db = get_db()
     posts = db.execute(
-        'SELECT post.id, user.id, user.username, post.title, post.body, post.created, '
+        'SELECT post.id, user.id, user.username, post.title, post.body, post.created, post.author_id,'
         ' IFNULL(likes.likes, "") as likes, IFNULL(likes.dislikes, "") as dislikes FROM user'
         ' INNER JOIN post ON post.author_id = user.id'
         ' LEFT JOIN likes ON likes.post_id = post.id'
