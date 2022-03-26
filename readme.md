@@ -9,4 +9,11 @@ flask run
 ** Later it can be processing of this text - NLP
 
 # Bugs
-* Edit button not available when logged in.
+
+# Docs
+https://docs.github.com/en/actions/quickstart
+https://resources.github.com/whitepapers/GitHub-Actions-Cheat-sheet/
+https://www.nobledesktop.com/learn/git/git-branches
+https://docs.github.com/en/get-started/using-git/about-git
+https://docs.docker.com/language/nodejs/develop/
+
