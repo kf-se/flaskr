@@ -7,6 +7,7 @@ from flaskr.auth import login_required
 from flaskr.db import get_db
 
 import sys
+import flaskr.nlp
 
 bp = Blueprint('blog', __name__)
 
@@ -44,7 +45,7 @@ def like(id):
 def index():
     db = get_db()
     posts = db.execute(
-        'SELECT post.id, user.id, user.username, post.title, post.body, post.created, post.author_id,'
+        'SELECT post.id, user.id, user.username, post.title, post.body, post.created, post.author_id, post.sentiment,'
         ' IFNULL(likes.likes, "") as likes, IFNULL(likes.dislikes, "") as dislikes FROM user'
         ' INNER JOIN post ON post.author_id = user.id'
         ' LEFT JOIN likes ON likes.post_id = post.id'
@@ -71,11 +72,13 @@ def create():
         if error is not None:
             flash(error)
         else:
+            sentiment = flaskr.nlp.sentiment(body)
+            
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?,?,?)',
-                (title, body, g.user['id'])
+                'INSERT INTO post (title, body, author_id, sentiment)'
+                ' VALUES (?,?,?,?)',
+                (title, body, g.user['id'], sentiment)
             )
             db.commit()
             return redirect(url_for('blog.index'))
