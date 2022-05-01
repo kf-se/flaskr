@@ -8,6 +8,7 @@ from flaskr.db import get_db
 
 import sys
 import flaskr.nlp
+import logging
 
 bp = Blueprint('blog', __name__)
 
@@ -43,6 +44,7 @@ def like(id):
 
 @bp.route('/')
 def index():
+    logging.info(f"loading start page")
     db = get_db()
     posts = db.execute(
         'SELECT post.id, user.id, user.username, post.title, post.body, post.created, post.author_id, post.sentiment,'
@@ -98,6 +100,7 @@ def get_post(id, check_author=True):
         abort(404, f"Post id {id} doesn't exist.")
 
     if check_author and post['author_id'] != g.user['id']:
+        logging.info(f"author id does not match with user")
         abort(403)
     
     return post
