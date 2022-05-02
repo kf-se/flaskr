@@ -1,5 +1,5 @@
 import functools
-import re
+import logging
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
@@ -32,6 +32,7 @@ def register():
                 db.commit()
             except db.IntegrityError:
                 error = f"User {username} is already registered."
+                logging.error(error, exc_info=True)
             else:
                 return redirect(url_for("auth.login"))
 

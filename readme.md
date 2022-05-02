@@ -1,3 +1,5 @@
+![Image of project](project_image.png)
+
 export FLASK_APP=flaskr
 export FLASK_ENV=development
 flask run
