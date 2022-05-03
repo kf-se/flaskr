@@ -43,6 +43,7 @@ def like(id):
 
 
 @bp.route('/')
+@bp.route('/index')
 def index():
     logging.info(f"loading start page")
     db = get_db()
