@@ -19,3 +19,4 @@ https://www.nobledesktop.com/learn/git/git-branches
 https://docs.github.com/en/get-started/using-git/about-git
 https://docs.docker.com/language/nodejs/develop/
 
+https://hackersandslackers.com/flask-sqlalchemy-database-models/
