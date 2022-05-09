@@ -2,6 +2,10 @@ from datetime import datetime
 from . import db
 
 class User(db.Model):
+    """ DataModel for User profiles """
+
+    __tablename__ = 'flaskr-users'
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), unique=True, nullable=False)
@@ -10,6 +14,9 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 class Post(db.Model):
+    """ DataModel for blog Posts """
+
+    __tablename__ = 'flaskr-posts'
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, unique=True, nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -23,6 +30,9 @@ class Post(db.Model):
 
 
 class Likes(db.Model):
+    """ DataModel for Likes/Dislikes associated with a Post """
+
+    __tablename__ = 'flaskr-likes'
     id = db.Column(db.Integer, primary_key=True)
     likes = db.Column(db.Integer, nullable=True)
     dislikes = db.Column(db.Integer, nullable=True)

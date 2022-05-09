@@ -6,7 +6,8 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from flaskr.db import get_db
+#from flaskr.db import get_db
+from .models import db, User
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -15,7 +16,6 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        db = get_db()
         error = None
 
         if not username:
@@ -24,16 +24,20 @@ def register():
             error = 'Password is required.'
         
         if error is None:
-            try:
-                db.execute(
-                    "INSERT INTO user (username, password) VALUES(?,?)",
-                    (username, generate_password_hash(password)),
-                )
-                db.commit()
-            except db.IntegrityError:
+            existing_user = User.query.filter(
+                User.username == username
+            ).first()
+            if existing_user:
                 error = f"User {username} is already registered."
                 logging.error(error, exc_info=True)
             else:
+                new_user = User(
+                    username=username,
+                    password=generate_password_hash(password)
+                )
+                db.session.add(new_user)
+                db.session.commit()
+
                 return redirect(url_for("auth.login"))
 
             flash(error)
@@ -46,11 +50,14 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        db = get_db()
+        #db = get_db()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
-        ).fetchone()
+        #user = db.execute(
+        #    'SELECT * FROM user WHERE username = ?', (username,)
+        #).fetchone()
+        user = User.query.filter(
+            User.username == username
+        ).first()
 
         if user is None:
             error = 'Incorrect username.'

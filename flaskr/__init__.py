@@ -2,7 +2,6 @@ import os
 import logging
 
 from flask import Flask
-
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -14,7 +13,7 @@ def create_app(test_config=None):
                         format="%(asctime)s - %(levelname)s - %(message)s")
 
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=False)
     app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI="postgresql://postgres:Fotboll!9@localhost/flaskrsql",
