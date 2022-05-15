@@ -5,9 +5,8 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 #from flaskr.db import get_db
-from .models import db, User
+from .models import db, User, Post, Likes
 
-import sys
 import flaskr.nlp
 import logging
 
@@ -17,29 +16,34 @@ bp = Blueprint('blog', __name__)
 @bp.route('/<int:id>/like', methods=('POST',))
 def like(id):
     post = get_post(id, False)
-    db = get_db()
+    #db = get_db()
 
     if request.method == 'POST':
         print(request.form)
         value = request.form['value']
-        
-        if value == 'like':
-            db.execute(
-                'INSERT INTO likes (post_id, likes, dislikes) VALUES(?,?, 0)'
-                'ON CONFLICT(post_id) DO UPDATE '
-                'SET likes = likes + ? WHERE post_id = ?',
-                (id, 1, 1, id)
-            )
-        else:
-            db.execute(
-                'INSERT INTO likes (post_id, likes, dislikes) VALUES(?,0,?)'
-                'ON CONFLICT(post_id) DO UPDATE '
-                'SET dislikes = dislikes + ? WHERE post_id = ?',
-                (id, 1, 1, id)
-            )
-            
-        db.commit()
+        post_likes = Likes.query.filter(
+            Likes.post_id == id
+        ).first()
 
+        if value == 'like':
+            #db.execute(
+            #    'INSERT INTO likes (post_id, likes, dislikes) VALUES(?,?, 0)'
+            #    'ON CONFLICT(post_id) DO UPDATE '
+            #    'SET likes = likes + ? WHERE post_id = ?',
+            #    (id, 1, 1, id)
+            #)
+            post_likes.likes = post_likes.likes + 1
+            
+        else:
+            #db.execute(
+            #    'INSERT INTO likes (post_id, likes, dislikes) VALUES(?,0,?)'
+            #    'ON CONFLICT(post_id) DO UPDATE '
+            #    'SET dislikes = dislikes + ? WHERE post_id = ?',
+            #    (id, 1, 1, id)
+            #)
+            post_likes.dislikes = post_likes.dislikes + 1
+        db.session.commit()    
+        
     return redirect(url_for('blog.index'))
 
 
@@ -47,15 +51,17 @@ def like(id):
 @bp.route('/index')
 def index():
     logging.info(f"loading start page")
-    db = get_db()
-    posts = db.execute(
-        'SELECT post.id, user.id, user.username, post.title, post.body, post.created, post.author_id, post.sentiment,'
-        ' IFNULL(likes.likes, "") as likes, IFNULL(likes.dislikes, "") as dislikes FROM user'
-        ' INNER JOIN post ON post.author_id = user.id'
-        ' LEFT JOIN likes ON likes.post_id = post.id'
-        ' ORDER BY created DESC'
-    ).fetchall()
+    #db = get_db()
+    #posts = db.execute(
+    #    'SELECT post.id, user.id, user.username, post.title, post.body, post.created, post.author_id, post.sentiment,'
+    #    ' IFNULL(likes.likes, "") as likes, IFNULL(likes.dislikes, "") as dislikes FROM user'
+    #    ' INNER JOIN post ON post.author_id = user.id'
+    #    ' LEFT JOIN likes ON likes.post_id = post.id'
+    #    ' ORDER BY created DESC'
+    #).fetchall()
+    posts = Post.query.order_by(Post.created.desc()).all()
 
+    logging.info(posts)
     return render_template('blog/index.html', posts=posts)
 
 
@@ -78,13 +84,20 @@ def create():
         else:
             sentiment = flaskr.nlp.sentiment(body)
             
-            db = get_db()
-            db.execute(
-                'INSERT INTO post (title, body, author_id, sentiment)'
-                ' VALUES (?,?,?,?)',
-                (title, body, g.user['id'], sentiment)
-            )
-            db.commit()
+            #db = get_db()
+            #db.execute(
+            #    'INSERT INTO post (title, body, author_id, sentiment)'
+            #    ' VALUES (?,?,?,?)',
+            #    (title, body, g.user['id'], sentiment)
+            #)
+            #db.commit()
+
+            post = Post(title=title, body=body, sentiment=sentiment)
+            user = User.query.filter(User.id == g.user.id).first()
+            user.posts.append(post)
+            
+            db.session.add(post)
+            db.session.commit()
             return redirect(url_for('blog.index'))
     
     return render_template('blog/create.html')

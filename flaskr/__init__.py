@@ -39,6 +39,7 @@ def create_app(test_config=None):
 
     with app.app_context():
 
+        from .models import User, Post, Likes
         db.create_all()
         
         from . import auth, blog, error_handler
