@@ -14,9 +14,14 @@ def create_app(test_config=None):
 
     # create and configure the app
     app = Flask(__name__, instance_relative_config=False)
+    
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url is None:
+        db_url = "postgresql://postgres:Fotboll!9@localhost/flaskrsql"
+
     app.config.from_mapping(
         SECRET_KEY='dev',
-        SQLALCHEMY_DATABASE_URI="postgresql://postgres:Fotboll!9@localhost/flaskrsql",
+        SQLALCHEMY_DATABASE_URI=db_url,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SQLALCHEMY_ECHO=True 
     )
