@@ -18,6 +18,9 @@ def create_app(test_config=None):
     db_url = os.environ.get('DATABASE_URL')
     if db_url is None:
         db_url = "postgresql://postgres:Fotboll!9@localhost/flaskrsql"
+    db_s = db_url.split(':')
+    db_s[0] = 'postgresql'
+    db_url = "".join(db_s)
 
     app.config.from_mapping(
         SECRET_KEY='dev',
