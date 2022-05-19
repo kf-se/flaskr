@@ -2,6 +2,9 @@ import os
 import logging
 
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 def create_app(test_config=None):
 
@@ -10,10 +13,17 @@ def create_app(test_config=None):
                         format="%(asctime)s - %(levelname)s - %(message)s")
 
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=False)
+    
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url is None:
+        db_url = "postgresql://postgres:Fotboll!9@localhost/flaskrsql"
+
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite')
+        SQLALCHEMY_DATABASE_URI=db_url,
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        SQLALCHEMY_ECHO=True 
     )
 
     if test_config is None:
@@ -29,13 +39,18 @@ def create_app(test_config=None):
     except OSError:
         pass
     
-    from . import db
+    #from . import db
     db.init_app(app)
 
-    from . import auth, blog, error_handler
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(blog.bp)
-    app.register_blueprint(error_handler.bp)
-    app.add_url_rule('/', endpoint='index')
+    with app.app_context():
 
-    return app
+        from .models import User, Post, Likes
+        db.create_all()
+        
+        from . import auth, blog, error_handler
+        app.register_blueprint(auth.bp)
+        app.register_blueprint(blog.bp)
+        app.register_blueprint(error_handler.bp)
+        app.add_url_rule('/', endpoint='index')
+
+        return app

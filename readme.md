@@ -6,11 +6,10 @@ flask run
 
 # TODO
 * Should make likes not reload entire page but to just update values on the index page.
-* Add a response to the blog post
-** This should first just be the first word of the post
-** Later it can be processing of this text - NLP
+* More advanced text analysis - NLP
 
 # Bugs
+Refactoring of all sqlite database code to use flask-sqlalchemy instead. See auth.py for reference or hackerslackers.
 
 # Docs
 https://docs.github.com/en/actions/quickstart
@@ -19,3 +18,4 @@ https://www.nobledesktop.com/learn/git/git-branches
 https://docs.github.com/en/get-started/using-git/about-git
 https://docs.docker.com/language/nodejs/develop/
 
+https://hackersandslackers.com/flask-sqlalchemy-database-models/

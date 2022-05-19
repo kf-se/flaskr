@@ -4,9 +4,8 @@ from flask import (
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
-from flaskr.db import get_db
+from .models import db, User, Post, Likes
 
-import sys
 import flaskr.nlp
 import logging
 
@@ -16,29 +15,26 @@ bp = Blueprint('blog', __name__)
 @bp.route('/<int:id>/like', methods=('POST',))
 def like(id):
     post = get_post(id, False)
-    db = get_db()
 
     if request.method == 'POST':
         print(request.form)
         value = request.form['value']
-        
-        if value == 'like':
-            db.execute(
-                'INSERT INTO likes (post_id, likes, dislikes) VALUES(?,?, 0)'
-                'ON CONFLICT(post_id) DO UPDATE '
-                'SET likes = likes + ? WHERE post_id = ?',
-                (id, 1, 1, id)
-            )
-        else:
-            db.execute(
-                'INSERT INTO likes (post_id, likes, dislikes) VALUES(?,0,?)'
-                'ON CONFLICT(post_id) DO UPDATE '
-                'SET dislikes = dislikes + ? WHERE post_id = ?',
-                (id, 1, 1, id)
-            )
-            
-        db.commit()
+        post_likes = Likes.query.filter(
+            Likes.post_id == id
+        ).first()
 
+        if post_likes == None:
+            post_likes = Likes(post_id=post.id, likes=0, dislikes=0)
+            db.session.add(post_likes)
+
+        if value == 'like':
+            post_likes.likes = post_likes.likes + 1
+            
+        else:
+            post_likes.dislikes = post_likes.dislikes + 1
+        
+        db.session.commit()    
+        
     return redirect(url_for('blog.index'))
 
 
@@ -46,15 +42,10 @@ def like(id):
 @bp.route('/index')
 def index():
     logging.info(f"loading start page")
-    db = get_db()
-    posts = db.execute(
-        'SELECT post.id, user.id, user.username, post.title, post.body, post.created, post.author_id, post.sentiment,'
-        ' IFNULL(likes.likes, "") as likes, IFNULL(likes.dislikes, "") as dislikes FROM user'
-        ' INNER JOIN post ON post.author_id = user.id'
-        ' LEFT JOIN likes ON likes.post_id = post.id'
-        ' ORDER BY created DESC'
-    ).fetchall()
+    posts = Post.query.order_by(Post.created.desc()).all()
+    #users = [User.query.filter(User.id in post.user_id).first()]
 
+    logging.info(posts)
     return render_template('blog/index.html', posts=posts)
 
 
@@ -76,31 +67,25 @@ def create():
             flash(error)
         else:
             sentiment = flaskr.nlp.sentiment(body)
+
+            post = Post(title=title, body=body, sentiment=sentiment)
+            user = User.query.filter(User.id == g.user.id).first()
+            user.posts.append(post)
             
-            db = get_db()
-            db.execute(
-                'INSERT INTO post (title, body, author_id, sentiment)'
-                ' VALUES (?,?,?,?)',
-                (title, body, g.user['id'], sentiment)
-            )
-            db.commit()
+            db.session.add(post)
+            db.session.commit()
             return redirect(url_for('blog.index'))
     
     return render_template('blog/create.html')
 
 
 def get_post(id, check_author=True):
-    post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
-    ).fetchone()
+    post = Post.query.filter(Post.id == id).first()
 
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")
 
-    if check_author and post['author_id'] != g.user['id']:
+    if check_author and post.user_id != g.user.id:
         logging.info(f"author id does not match with user")
         abort(403)
     
@@ -124,13 +109,11 @@ def update(id):
         if error is not None:
             flash(error)
         else:
-            db = get_db()
-            db.execute(
-                'UPDATE post SET title = ?, body = ?'
-                ' WHERE id = ?',
-                (title, body, id)
-            )
-            db.commit()
+            post.title = title
+            post.body = body
+            db.session.add(post)
+            db.session.commit()
+            
             return redirect(url_for('blog.index'))
 
     return render_template('blog/update.html', post=post)
@@ -139,10 +122,10 @@ def update(id):
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
 def delete(id):
-    get_post(id)
-    db = get_db()
-    db.execute('DELETE FROM post WHERE id = ?', (id,))
-    db.commit()
+    post = get_post(id)
+    db.session.delete(post.likes)
+    db.session.delete(post)
+    db.session.commit()
     return redirect(url_for('blog.index'))
 
 
