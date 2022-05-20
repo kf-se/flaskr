@@ -16,10 +16,9 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=False)
     
     db_url = os.environ.get('DATABASE_URL')
-    if db_url is None:
-        db_url = "postgresql://postgres:Fotboll!9@localhost/flaskrsql"
+    
     if db_url.startswith('postgres://'):
-        db_url.replace('postgres://', 'postgresql://', 1)
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
 
     app.config.from_mapping(
         SECRET_KEY='dev',
