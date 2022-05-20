@@ -3,6 +3,7 @@ import logging
 import pickle
 
 from flask import Flask
+from flask import g
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -46,8 +47,12 @@ def create_app(test_config=None):
 
     with app.app_context():
 
+        # load ML models.
+        resource_path = os.path.join(app.root_path, 'resources/')
         nlp_model = pickle.load(open(resource_path + 'gnb_nlp_model.pickle', 'rb'))
         cv = pickle.load(open(resource_path + 'cv_nlp.pickle', 'rb'))
+        g.nlp_model = nlp_model
+        g.cv = cv
 
         from .models import User, Post, Likes
         db.create_all()
