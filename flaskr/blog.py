@@ -66,7 +66,9 @@ def create():
         if error is not None:
             flash(error)
         else:
+            logging.info('Creating sentiment')
             sentiment = flaskr.nlp.sentiment(body)
+            logging.info('Sentiment created: {}'.format(sentiment))
 
             post = Post(title=title, body=body, sentiment=sentiment)
             user = User.query.filter(User.id == g.user.id).first()
