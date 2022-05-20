@@ -11,12 +11,16 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
+resource_path = os.path.join(current_app.root_path, 'resources/')
+nlp_model = pickle.load(open(resource_path + 'gnb_nlp_model.pickle', 'rb'))
+cv = pickle.load(open(resource_path + 'cv_nlp.pickle', 'rb'))
+
 def sentiment(body):
     mapper = {0:'Unhappy', 1:'Happy'}
     # load CountVectorizer, nlp model, porterstemmer
-    resource_path = os.path.join(current_app.root_path, 'resources/')
-    nlp_model = pickle.load(open(resource_path + 'gnb_nlp_model.pickle', 'rb'))
-    cv = pickle.load(open(resource_path + 'cv_nlp.pickle', 'rb'))
+    #resource_path = os.path.join(current_app.root_path, 'resources/')
+    #nlp_model = pickle.load(open(resource_path + 'gnb_nlp_model.pickle', 'rb'))
+    #cv = pickle.load(open(resource_path + 'cv_nlp.pickle', 'rb'))
     ps = PorterStemmer()
     # preprocess text body with re.sub and PorterStemmer, stopwords
     data = re.sub('[^a-zA-Z]', ' ', body)

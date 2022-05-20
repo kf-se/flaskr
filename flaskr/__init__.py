@@ -1,5 +1,6 @@
 import os
 import logging
+import pickle
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -44,6 +45,9 @@ def create_app(test_config=None):
     db.init_app(app)
 
     with app.app_context():
+
+        nlp_model = pickle.load(open(resource_path + 'gnb_nlp_model.pickle', 'rb'))
+        cv = pickle.load(open(resource_path + 'cv_nlp.pickle', 'rb'))
 
         from .models import User, Post, Likes
         db.create_all()
