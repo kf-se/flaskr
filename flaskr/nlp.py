@@ -11,9 +11,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
-resource_path = os.path.join(current_app.root_path, 'resources/')
-nlp_model = pickle.load(open(resource_path + 'gnb_nlp_model.pickle', 'rb'))
-cv = pickle.load(open(resource_path + 'cv_nlp.pickle', 'rb'))
+
 
 def sentiment(body):
     mapper = {0:'Unhappy', 1:'Happy'}
@@ -32,7 +30,7 @@ def sentiment(body):
     data = ' '.join(data)
     X = [data]
     # make sentiment
-    X = cv.transform(X).toarray()
-    y_pred = nlp_model.predict(X)
+    X = g.cv.transform(X).toarray()
+    y_pred = g.nlp_model.predict(X)
 
     return mapper[y_pred[0]]
