@@ -32,6 +32,7 @@ class Post(db.Model):
     title = db.Column(db.String(120), nullable=False)
     body = db.Column(db.String(540), nullable=False)
     sentiment = db.Column(db.String(80), nullable=False)
+
     user_id = db.Column(db.Integer, db.ForeignKey('flaskr_users.id'), nullable=False)
 
     likes = db.relationship('Likes', backref='flaskr_posts', lazy=True, uselist=False)

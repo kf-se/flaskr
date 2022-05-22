@@ -11,30 +11,25 @@ db = SQLAlchemy()
 def create_app(test_config=None):
 
     # create the logger
-    logging.basicConfig(level=logging.INFO, filename="log.log", filemode="w",
-                        format="%(asctime)s - %(levelname)s - %(message)s")
-
+    #logging.basicConfig(level=logging.INFO, filename="log.log", filemode="w",
+    #                    format="%(asctime)s - %(levelname)s - %(message)s")
+    
     # create and configure the app
     app = Flask(__name__, instance_relative_config=False)
-    
-    db_url = os.environ.get('DATABASE_URL')
-    
-    if db_url.startswith('postgres://'):
-        db_url = db_url.replace('postgres://', 'postgresql://', 1)
 
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        SQLALCHEMY_DATABASE_URI=db_url,
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        SQLALCHEMY_ECHO=True 
-    )
+    if __name__ != '__main__':
+        gunicorn_logger = logging.getLogger('gunicorn.error')
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+    
+    # Get config based on environment
+    flask_env = os.environ.get('FLASK_ENV')
+    if flask_env == 'production':
+        configuration = 'config.ProductionConfig'
 
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
+    elif flask_env == 'development':
+        configuration = 'config.DevelopmentConfig'  
+    app.config.from_object(configuration)
 
     # ensure the instance folder exists
     try:

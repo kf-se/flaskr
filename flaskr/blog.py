@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for, current_app
 )
 from werkzeug.exceptions import abort
 
@@ -41,11 +41,10 @@ def like(id):
 @bp.route('/')
 @bp.route('/index')
 def index():
-    logging.info(f"loading start page")
+    current_app.logger.info(f"Loading start page")
     posts = Post.query.order_by(Post.created.desc()).all()
-    #users = [User.query.filter(User.id in post.user_id).first()]
 
-    logging.info(posts)
+    current_app.logger.info(posts)
     return render_template('blog/index.html', posts=posts)
 
 
@@ -66,9 +65,13 @@ def create():
         if error is not None:
             flash(error)
         else:
-            logging.info('Creating sentiment')
-            sentiment = flaskr.nlp.sentiment(body)
-            logging.info('Sentiment created: {}'.format(sentiment))
+            current_app.logger.info('Creating sentiment')
+            try:
+                sentiment = flaskr.nlp.sentiment(body)
+            except:
+                current_app.logger.error('')
+                return redirect(url_for('blog.index'))
+            current_app.logger.info('Sentiment created: {}'.format(sentiment))
 
             post = Post(title=title, body=body, sentiment=sentiment)
             user = User.query.filter(User.id == g.user.id).first()
@@ -88,7 +91,7 @@ def get_post(id, check_author=True):
         abort(404, f"Post id {id} doesn't exist.")
 
     if check_author and post.user_id != g.user.id:
-        logging.info(f"author id does not match with user")
+        current_app.logger.debug(f"author id does not match with user")
         abort(403)
     
     return post

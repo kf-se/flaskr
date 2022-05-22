@@ -9,7 +9,7 @@ flask run
 * More advanced text analysis - NLP
 
 # Bugs
-Refactoring of all sqlite database code to use flask-sqlalchemy instead. See auth.py for reference or hackerslackers.
+heroku logging https://betterstack.com/community/guides/logging/how-to-start-logging-with-heroku/
 
 # Docs
 https://docs.github.com/en/actions/quickstart
