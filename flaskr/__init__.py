@@ -22,6 +22,8 @@ def create_app(test_config=None):
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
         app.logger.info('Attached gunicorn logger...')
+    else:
+        app.logger.fileHandler
     
     # Get config based on environment
     flask_env = os.environ.get('FLASK_ENV')
@@ -32,7 +34,7 @@ def create_app(test_config=None):
         configuration = 'config.DevelopmentConfig'  
     app.config.from_object(configuration)
 
-    # ensure the instance folder exists
+    # ensure the instance folder exists - this is only necessary for sqlite db
     try:
         os.makedirs(app.instance_path)
     except OSError:
