@@ -21,6 +21,7 @@ def create_app(test_config=None):
         gunicorn_logger = logging.getLogger('gunicorn.error')
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
+        app.logger.info('Attached gunicorn logger...')
     
     # Get config based on environment
     flask_env = os.environ.get('FLASK_ENV')

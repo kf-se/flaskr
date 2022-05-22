@@ -2,7 +2,7 @@ import functools
 import logging
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -29,7 +29,7 @@ def register():
             ).first()
             if existing_user:
                 error = f"User {username} is already registered."
-                logging.error(error, exc_info=True)
+                current_app.logger.error(error, exc_info=True)
             else:
                 new_user = User(
                     username=username,
