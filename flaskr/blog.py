@@ -51,6 +51,7 @@ def index():
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
+    current_app.logger.info('serving create')
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']

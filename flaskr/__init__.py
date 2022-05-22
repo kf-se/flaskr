@@ -43,6 +43,7 @@ def create_app(test_config=None):
     with app.app_context():
 
         # load ML models.
+        app.logger.info('Loading ML models...')
         resource_path = os.path.join(app.root_path, 'resources/')
         nlp_model = pickle.load(open(resource_path + 'gnb_nlp_model.pickle', 'rb'))
         cv = pickle.load(open(resource_path + 'cv_nlp.pickle', 'rb'))
@@ -50,12 +51,15 @@ def create_app(test_config=None):
         g.cv = cv
 
         from .models import User, Post, Likes
+        app.logger.info('Creating database tables...')
         db.create_all()
         
         from . import auth, blog, error_handler
+        app.logger.info('Registering blueprints...')
         app.register_blueprint(auth.bp)
         app.register_blueprint(blog.bp)
         app.register_blueprint(error_handler.bp)
         app.add_url_rule('/', endpoint='index')
 
+        app.logger.info('App creation done...')
         return app
