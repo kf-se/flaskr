@@ -35,7 +35,7 @@ class Post(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('flaskr_users.id'), nullable=False)
 
-    likes = db.relationship('Likes', backref='flaskr_posts', lazy=True, uselist=False)
+    likes = db.relationship('Likes', backref='flaskr_posts', lazy=True, uselist=False, cascade="all, delete-orphan")
 
     def __repr__(self):
         return '<Post %r>' % self.title

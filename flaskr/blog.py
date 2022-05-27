@@ -129,7 +129,7 @@ def update(id):
 @login_required
 def delete(id):
     post = get_post(id)
-    db.session.delete(post.likes)
+    #db.session.delete(post.likes)
     db.session.delete(post)
     db.session.commit()
     return redirect(url_for('blog.index'))
