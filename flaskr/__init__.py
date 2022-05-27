@@ -23,8 +23,9 @@ def create_app(test_config=None):
         app.logger.setLevel(gunicorn_logger.level)
         app.logger.info('Attached gunicorn logger...')
     else:
-        app.logger.fileHandler
-    
+        app.logger.fileHandler('logs/log.log')
+    #app.logger.addHandler(handler)
+
     # Get config based on environment
     flask_env = os.environ.get('FLASK_ENV')
     if flask_env == 'production':
@@ -50,8 +51,8 @@ def create_app(test_config=None):
         resource_path = os.path.join(app.root_path, 'resources/')
         nlp_model = pickle.load(open(resource_path + 'gnb_nlp_model.pickle', 'rb'))
         cv = pickle.load(open(resource_path + 'cv_nlp.pickle', 'rb'))
-        g.nlp_model = nlp_model
-        g.cv = cv
+        app.nlp_model = nlp_model
+        app.cv = cv
 
         from .models import User, Post, Likes
         app.logger.info('Creating database tables...')

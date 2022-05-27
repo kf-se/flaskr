@@ -4,12 +4,14 @@ from flask import (
 import pandas as pd
 import numpy as np
 import re
-import nltk
+#import nltk
+import pickle
 #nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
-
+with open('all_stopwords.pkl', 'rb') as f:
+    all_stopwords = pickle.load(f)
 
 def sentiment(body):
     mapper = {0:'Unhappy', 1:'Happy'}
@@ -22,13 +24,14 @@ def sentiment(body):
     data = re.sub('[^a-zA-Z]', ' ', body)
     data = data.lower()
     data = data.split()
-    all_stopwords = stopwords.words('english')
-    all_stopwords.remove('not')
+    #all_stopwords = stopwords.words('english')
+    #all_stopwords.remove('not')
+    
     data = [ps.stem(word) for word in data if not word in set(all_stopwords)]
     data = ' '.join(data)
     X = [data]
     # make sentiment
-    X = g.cv.transform(X).toarray()
-    y_pred = g.nlp_model.predict(X)
+    X = current_app.cv.transform(X).toarray()
+    y_pred = current_app.nlp_model.predict(X)
 
     return mapper[y_pred[0]]
