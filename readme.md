@@ -1,21 +1,14 @@
 ![Image of project](project_image.png)
 
-export FLASK_APP=flaskr
-export FLASK_ENV=development
-flask run
+Hi, 
 
-# TODO
-* Should make likes not reload entire page but to just update values on the index page.
-* More advanced text analysis - NLP
+In this repo you'll find a python webapp built with the Flask web framework. The app is hosted on the cloud platform Heroku and is connected to a Postgre database. 
 
-# Bugs
-heroku logging https://betterstack.com/community/guides/logging/how-to-start-logging-with-heroku/
+The app consists of a blog which you can register to and create posts. You can update/delete your own and upvote others. As you make a post a simple machine learning model will ingest your post body and create a sentiment based on the content. This sentiment is added to the post title.
 
-# Docs
-https://docs.github.com/en/actions/quickstart
-https://resources.github.com/whitepapers/GitHub-Actions-Cheat-sheet/
-https://www.nobledesktop.com/learn/git/git-branches
-https://docs.github.com/en/get-started/using-git/about-git
-https://docs.docker.com/language/nodejs/develop/
+This is a learning project for me so I have not been too concerned with robustness, clean code or performance. 
 
-https://hackersandslackers.com/flask-sqlalchemy-database-models/
+Please enjoy!
+
+Kind regards
+KF
