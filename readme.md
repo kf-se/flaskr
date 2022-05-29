@@ -10,5 +10,3 @@ This is a learning project for me so I have not been too concerned with robustne
 
 Please enjoy!
 
-Kind regards
-KF
